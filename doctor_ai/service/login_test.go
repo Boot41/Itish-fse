@@ -47,10 +47,10 @@ func setupLoginTestDB(t *testing.T) (*models.Doctor, error) {
 		ID:             uuid.New(),
 		Email:          "test@example.com",
 		Password:       string(hashedPassword),
-		Name:          "Test Doctor",
-		Phone:         "1234567890",
+		Name:           "Test Doctor",
+		Phone:          "1234567890",
 		Specialization: "Test Specialization",
-		CreatedAt:     time.Now(),
+		CreatedAt:      time.Now(),
 	}
 
 	if err := db.Create(testDoctor).Error; err != nil {
@@ -65,10 +65,10 @@ func TestDoctorLogin(t *testing.T) {
 	assert.NoError(t, err)
 
 	tests := []struct {
-		name     string
-		user     *models.Doctor
-		wantErr  bool
-		errMsg   string
+		name    string
+		user    *models.Doctor
+		wantErr bool
+		errMsg  string
 	}{
 		{
 			name: "Valid credentials",

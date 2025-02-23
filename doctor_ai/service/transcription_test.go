@@ -113,12 +113,12 @@ func setupTranscriptionTestDB(t *testing.T) (uuid.UUID, uuid.UUID, error) {
 	doctorID := uuid.New()
 	doctor := &models.Doctor{
 		ID:             doctorID,
-		Name:          "Test Doctor",
-		Email:         fmt.Sprintf("test%s@example.com", doctorID.String()[:8]),
-		Password:      "hashedpassword",
-		Phone:         fmt.Sprintf("1234%s", doctorID.String()[:6]),
+		Name:           "Test Doctor",
+		Email:          fmt.Sprintf("test%s@example.com", doctorID.String()[:8]),
+		Password:       "hashedpassword",
+		Phone:          fmt.Sprintf("1234%s", doctorID.String()[:6]),
 		Specialization: "Test Specialization",
-		CreatedAt:     time.Now(),
+		CreatedAt:      time.Now(),
 	}
 	if err := db.Create(doctor).Error; err != nil {
 		t.Fatalf("Failed to create test doctor: %v", err)
@@ -128,10 +128,10 @@ func setupTranscriptionTestDB(t *testing.T) (uuid.UUID, uuid.UUID, error) {
 	patientID := uuid.New()
 	patient := &models.Patient{
 		ID:        patientID,
-		Name:     "Test Patient",
-		Age:      30,
-		Gender:   "Male",
-		DoctorID: doctorID,
+		Name:      "Test Patient",
+		Age:       30,
+		Gender:    "Male",
+		DoctorID:  doctorID,
 		CreatedAt: time.Now(),
 	}
 	if err := db.Create(patient).Error; err != nil {
@@ -226,20 +226,18 @@ func TestGetTranscriptions(t *testing.T) {
 
 func TestGetTranscriptionByID(t *testing.T) {
 	tests := []struct {
-		name            string
-		wantErr         bool
+		name    string
+		wantErr bool
 	}{
 		{
-			name:            "Valid transcription ID",
-			wantErr:         false,
+			name:    "Valid transcription ID",
+			wantErr: false,
 		},
 		{
-			name:            "Invalid transcription ID",
-			wantErr:         true,
+			name:    "Invalid transcription ID",
+			wantErr: true,
 		},
 	}
-
-
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -368,31 +366,31 @@ func TestGetTranscriptionByPatient(t *testing.T) {
 	transcription2 := createTestTranscription(t, doctorID, patientID)
 
 	tests := []struct {
-		name       string
-		doctorID   uuid.UUID
-		patientID  uuid.UUID
-		wantErr    bool
+		name        string
+		doctorID    uuid.UUID
+		patientID   uuid.UUID
+		wantErr     bool
 		checkLatest bool
 	}{
 		{
-			name:       "Valid request",
-			doctorID:   doctorID,
-			patientID:  patientID,
-			wantErr:    false,
+			name:        "Valid request",
+			doctorID:    doctorID,
+			patientID:   patientID,
+			wantErr:     false,
 			checkLatest: true,
 		},
 		{
-			name:       "Invalid doctor ID",
-			doctorID:   uuid.New(),
-			patientID:  patientID,
-			wantErr:    true,
+			name:        "Invalid doctor ID",
+			doctorID:    uuid.New(),
+			patientID:   patientID,
+			wantErr:     true,
 			checkLatest: false,
 		},
 		{
-			name:       "Invalid patient ID",
-			doctorID:   doctorID,
-			patientID:  uuid.New(),
-			wantErr:    true,
+			name:        "Invalid patient ID",
+			doctorID:    doctorID,
+			patientID:   uuid.New(),
+			wantErr:     true,
 			checkLatest: false,
 		},
 	}

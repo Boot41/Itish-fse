@@ -77,7 +77,7 @@ func createTestDoctor(t *testing.T) *models.Doctor {
 		Name:           "Test Doctor",
 		Email:          "test@example.com",
 		Password:       "password123",
-		Phone:         "1234567890",
+		Phone:          "1234567890",
 		Specialization: "Test Specialization",
 		CreatedAt:      time.Now(),
 	}
@@ -250,36 +250,36 @@ func TestGetPatientWithTranscription(t *testing.T) {
 	assert.NoError(t, err)
 
 	tests := []struct {
-		name           string
-		doctorID      uuid.UUID
-		patientID     uuid.UUID
-		wantPatient   bool
+		name              string
+		doctorID          uuid.UUID
+		patientID         uuid.UUID
+		wantPatient       bool
 		wantTranscription bool
-		wantErr       bool
+		wantErr           bool
 	}{
 		{
-			name:           "Valid patient and transcription",
-			doctorID:      doctor.ID,
-			patientID:     patient.ID,
-			wantPatient:   true,
+			name:              "Valid patient and transcription",
+			doctorID:          doctor.ID,
+			patientID:         patient.ID,
+			wantPatient:       true,
 			wantTranscription: true,
-			wantErr:       false,
+			wantErr:           false,
 		},
 		{
-			name:           "Patient not found",
-			doctorID:      doctor.ID,
-			patientID:     uuid.New(),
-			wantPatient:   false,
+			name:              "Patient not found",
+			doctorID:          doctor.ID,
+			patientID:         uuid.New(),
+			wantPatient:       false,
 			wantTranscription: false,
-			wantErr:       true,
+			wantErr:           true,
 		},
 		{
-			name:           "Unauthorized doctor",
-			doctorID:      uuid.New(),
-			patientID:     patient.ID,
-			wantPatient:   false,
+			name:              "Unauthorized doctor",
+			doctorID:          uuid.New(),
+			patientID:         patient.ID,
+			wantPatient:       false,
 			wantTranscription: false,
-			wantErr:       true,
+			wantErr:           true,
 		},
 	}
 

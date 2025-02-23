@@ -11,6 +11,7 @@ import { Spinner } from '../ui/Spinner';
 import { EmptyState } from '../ui/EmptyState';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
+import MedicalSuggestions from './MedicalSuggestions'; // Import MedicalSuggestions component
 
 interface PatientCardProps {
   patient: Patient;
@@ -24,7 +25,7 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, image, onEdit, onReq
 
   return (
     <div 
-      className="relative w-[280px] h-[360px] bg-[#1C1C1C] rounded-lg border border-[#2a2a2a] group transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:border-emerald-500/50 cursor-pointer overflow-hidden"
+      className="relative w-[280px] h-[360px] bg-[#2a2a2a] rounded-lg border border-[#3a3a3a] group transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:border-emerald-500/50 cursor-pointer overflow-hidden"
       onClick={() => navigate(`/logs?search=${encodeURIComponent(patient.name)}`)}
     >
       {/* Top gradient bar */}
@@ -53,11 +54,11 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, image, onEdit, onReq
 
           {/* Info grid */}
           <div className="grid grid-cols-2 gap-3 mt-4 mb-16">
-            <div className="bg-[#2a2a2a] rounded-lg p-3 border border-[#333] group-hover:border-emerald-500/20 transition-colors duration-300">
+            <div className="bg-[#333] rounded-lg p-3 border border-[#3a3a3a] group-hover:border-emerald-500/20 transition-colors duration-300">
               <div className="text-xs text-gray-400 mb-1">Age</div>
               <div className="text-white font-medium">{patient.age}</div>
             </div>
-            <div className="bg-[#2a2a2a] rounded-lg p-3 border border-[#333] group-hover:border-emerald-500/20 transition-colors duration-300">
+            <div className="bg-[#333] rounded-lg p-3 border border-[#3a3a3a] group-hover:border-emerald-500/20 transition-colors duration-300">
               <div className="text-xs text-gray-400 mb-1">Gender</div>
               <div className="text-white font-medium">{patient.gender}</div>
             </div>
@@ -65,14 +66,14 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, image, onEdit, onReq
         </div>
 
         {/* Action buttons - Fixed at bottom with glass effect */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#1C1C1C] via-[#1C1C1C] to-transparent">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#2a2a2a] via-[#2a2a2a] to-transparent">
           <div className="grid grid-cols-2 gap-3 px-2">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit(patient);
               }}
-              className="flex items-center justify-center gap-2 py-2 rounded-lg bg-[#2a2a2a] hover:bg-emerald-500/10 border border-[#333] hover:border-emerald-500/30 transition-all duration-300 group/edit"
+              className="flex items-center justify-center gap-2 py-2 rounded-lg bg-[#333] hover:bg-emerald-500/10 border border-[#3a3a3a] hover:border-emerald-500/30 transition-all duration-300 group/edit"
             >
               <Pencil className="w-4 h-4 text-emerald-500 transition-transform duration-300 group-hover/edit:scale-110" />
               <span className="text-sm text-emerald-500">Edit</span>
@@ -82,7 +83,7 @@ const PatientCard: React.FC<PatientCardProps> = ({ patient, image, onEdit, onReq
                 e.stopPropagation();
                 onRequestDelete(patient);
               }}
-              className="flex items-center justify-center gap-2 py-2 rounded-lg bg-[#2a2a2a] hover:bg-red-500/10 border border-[#333] hover:border-red-500/30 transition-all duration-300 group/delete"
+              className="flex items-center justify-center gap-2 py-2 rounded-lg bg-[#333] hover:bg-red-500/10 border border-[#3a3a3a] hover:border-red-500/30 transition-all duration-300 group/delete"
             >
               <Trash2 className="w-4 h-4 text-red-400 transition-transform duration-300 group-hover/delete:scale-110" />
               <span className="text-sm text-red-400">Delete</span>
@@ -261,7 +262,7 @@ const Patients: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#1C1C1C] p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-[90rem] mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div className="flex items-center space-x-4">
             <h2 className="text-3xl font-bold text-white flex items-center gap-3">
@@ -303,16 +304,21 @@ const Patients: React.FC = () => {
             description={error}
           />
         ) : filteredPatients.length > 0 ? (
-          <div className="flex flex-wrap gap-10 overflow-hidden w-full">
-            {filteredPatients.map((patient, index) => (
-              <PatientCard 
-                key={patient.id}
-                patient={patient}
-                image={patientImages[index % patientImages.length]}
-                onEdit={handleEditPatient}
-                onRequestDelete={handleRequestDelete}
-              />
-            ))}
+          <div className="flex gap-24 px-4 pb-4 relative min-h-[calc(100vh-12rem)]">
+            <MedicalSuggestions />
+            <div className="flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-24 gap-y-10">
+                {filteredPatients.map((patient, index) => (
+                  <PatientCard 
+                    key={patient.id}
+                    patient={patient}
+                    image={patientImages[index % patientImages.length]}
+                    onEdit={handleEditPatient}
+                    onRequestDelete={handleRequestDelete}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         ) : (
           <EmptyState

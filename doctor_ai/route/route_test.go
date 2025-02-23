@@ -155,7 +155,7 @@ func TestSetupRoutes(t *testing.T) {
 			// Create a test request
 			w := httptest.NewRecorder()
 			req, _ := http.NewRequest(tt.method, tt.path, nil)
-			
+
 			// Serve the request directly
 			r.ServeHTTP(w, req)
 

@@ -73,7 +73,7 @@ func TestGenerateToken(t *testing.T) {
 
 			// Verify claims
 			assert.Equal(t, tt.email, claims["email"])
-			
+
 			// Verify expiration time
 			exp := time.Unix(int64(claims["exp"].(float64)), 0)
 			expectedExp := time.Now().Add(time.Hour * 24)

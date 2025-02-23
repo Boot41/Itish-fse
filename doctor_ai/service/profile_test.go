@@ -51,7 +51,7 @@ func createTestDoctorForProfile(t *testing.T, email string) *models.Doctor {
 		Name:           "Test Doctor",
 		Email:          email,
 		Password:       "password123",
-		Phone:         "1234567890",
+		Phone:          "1234567890",
 		Specialization: "Test Specialization",
 		CreatedAt:      time.Now(),
 	}
@@ -117,28 +117,28 @@ func TestUpdateDoctorProfile(t *testing.T) {
 	testEmail := "test@example.com" // Use a constant email for test cases
 
 	tests := []struct {
-		name           string
-		email          string
-		newName        string
-		newPhone       string
+		name              string
+		email             string
+		newName           string
+		newPhone          string
 		newSpecialization string
-		wantErr        bool
+		wantErr           bool
 	}{
 		{
-			name:           "Valid update - all fields",
-			email:          testEmail,
-			newName:        "Updated Doctor",
-			newPhone:       "9876543210",
+			name:              "Valid update - all fields",
+			email:             testEmail,
+			newName:           "Updated Doctor",
+			newPhone:          "9876543210",
 			newSpecialization: "Updated Specialization",
-			wantErr:        false,
+			wantErr:           false,
 		},
 		{
-			name:           "Valid update - partial fields",
-			email:          testEmail,
-			newName:        "Another Name",
-			newPhone:       "",
+			name:              "Valid update - partial fields",
+			email:             testEmail,
+			newName:           "Another Name",
+			newPhone:          "",
 			newSpecialization: "",
-			wantErr:        false,
+			wantErr:           false,
 		},
 	}
 

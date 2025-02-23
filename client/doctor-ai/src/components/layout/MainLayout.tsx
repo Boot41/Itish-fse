@@ -1,5 +1,5 @@
 import { FC, ReactNode, useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Stethoscope, Menu, X, LogOut, Users, ClipboardList, Github, Twitter, Linkedin } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import AuthModal from '../auth/AuthModal';
@@ -14,7 +14,6 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const location = useLocation();
-
   const navigate = useNavigate();
 
   const handleSignOut = () => {
@@ -42,7 +41,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen">
-      <header className={`header fixed top-0 left-0 right-0 bg-[#1C1C1C] z-[997] ${
+      <header className={`header fixed top-0 left-0 right-0 bg-[#1C1C1C] z-40 ${
         isScrolled ? 'scrolled' : ''
       }`}>
         <nav className="container mx-auto px-4 py-4">
@@ -58,24 +57,20 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
                 <div className="flex items-center space-x-8">
                   <NavLink 
                     to="/patients" 
-                    className={({ isActive }) => ({
-                      className: `
-                        flex items-center 
-                        ${isActive ? 'text-[#3ECF8E]' : ''}
-                      `
-                    })}
+                    className={({ isActive }) => `
+                      flex items-center 
+                      ${isActive ? 'text-[#3ECF8E]' : ''}
+                    `}
                   >
                     <Users className="w-5 h-5 mr-2" />
                     Patients
                   </NavLink>
                   <NavLink 
                     to="/logs" 
-                    className={({ isActive }) => ({
-                      className: `
-                        flex items-center 
-                        ${isActive ? 'text-[#3ECF8E]' : ''}
-                      `
-                    })}
+                    className={({ isActive }) => `
+                      flex items-center 
+                      ${isActive ? 'text-[#3ECF8E]' : ''}
+                    `}
                   >
                     <ClipboardList className="w-5 h-5 mr-2" />
                     Transcripts
@@ -116,43 +111,39 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
           </div>
 
           {/* Mobile Navigation */}
-          <div className={`mobile-menu ${
-            isOpen ? 'block' : 'hidden'
-          }`}>
+          <div className={`mobile-menu ${isOpen ? 'block' : 'hidden'}`}>
             <div className="flex flex-col space-y-2 pb-4">
               {isAuthenticated && (
                 <div className="space-y-4 px-4">
                   <div className="flex flex-col space-y-2">
-                    <MobileNavLink 
+                    <NavLink 
                       to="/patients"
-                      className={({ isActive }) => ({
-                        className: `
-                          mobile-menu-link 
-                          w-full 
-                          text-left 
-                          flex items-center 
-                          ${isActive ? 'text-[#3ECF8E]' : ''}
-                        `
-                      })}
+                      className={({ isActive }) => `
+                        mobile-menu-link 
+                        w-full 
+                        text-left 
+                        flex items-center 
+                        ${isActive ? 'text-[#3ECF8E]' : ''}
+                      `}
+                      onClick={() => setIsOpen(false)}
                     >
                       <Users className="w-5 h-5 inline-block mr-1" />
                       Patients
-                    </MobileNavLink>
-                    <MobileNavLink 
+                    </NavLink>
+                    <NavLink 
                       to="/logs"
-                      className={({ isActive }) => ({
-                        className: `
-                          mobile-menu-link 
-                          w-full 
-                          text-left 
-                          flex items-center 
-                          ${isActive ? 'text-[#3ECF8E]' : ''}
-                        `
-                      })}
+                      className={({ isActive }) => `
+                        mobile-menu-link 
+                        w-full 
+                        text-left 
+                        flex items-center 
+                        ${isActive ? 'text-[#3ECF8E]' : ''}
+                      `}
+                      onClick={() => setIsOpen(false)}
                     >
                       <ClipboardList className="w-5 h-5 inline-block mr-1" />
                       Transcripts
-                    </MobileNavLink>
+                    </NavLink>
                     <button 
                       className="mobile-menu-link w-full text-left flex items-center justify-between" 
                       onClick={() => {
@@ -172,10 +163,34 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
                 <></>
               ) : (
                 <>
-                  <MobileNavLink to="/about">About</MobileNavLink>
-                  <MobileNavLink to="/features">Features</MobileNavLink>
+                  <NavLink 
+                    to="/about"
+                    className={({ isActive }) => `
+                      mobile-menu-link 
+                      w-full 
+                      text-left 
+                      px-4
+                      ${isActive ? 'text-[#3ECF8E]' : ''}
+                    `}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    About
+                  </NavLink>
+                  <NavLink 
+                    to="/features"
+                    className={({ isActive }) => `
+                      mobile-menu-link 
+                      w-full 
+                      text-left 
+                      px-4
+                      ${isActive ? 'text-[#3ECF8E]' : ''}
+                    `}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Features
+                  </NavLink>
                   <button 
-                    className="mobile-menu-link w-full text-left flex items-center justify-between" 
+                    className="mobile-menu-link w-full text-left flex items-center justify-between px-4" 
                     onClick={() => {
                       setIsAuthModalOpen(true);
                       setIsOpen(false);
@@ -246,6 +261,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
           </div>
         </div>
       </footer>
+
       {isAuthModalOpen && (
         <AuthModal 
           isOpen={isAuthModalOpen} 
@@ -253,62 +269,6 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
         />
       )}
     </div>
-  );
-};
-
-const NavLink: FC<{ 
-  to: string; 
-  children: React.ReactNode; 
-  className?: (params: { isActive: boolean }) => { 
-    className: string 
-  } 
-}> = ({ 
-  to, 
-  children, 
-  className 
-}) => {
-  const { pathname } = useLocation();
-  const isActive = pathname === to;
-
-  return (
-    <Link 
-      to={to} 
-      className={
-        className 
-          ? className({ isActive }).className 
-          : `transition-all duration-300 ease-in-out hover:text-emerald-400 ${isActive ? 'text-emerald-500' : 'text-gray-300'}`
-      }
-    >
-      {children}
-    </Link>
-  );
-};
-
-const MobileNavLink: FC<{ 
-  to: string; 
-  children: React.ReactNode; 
-  className?: (params: { isActive: boolean }) => { 
-    className: string 
-  } 
-}> = ({ 
-  to, 
-  children, 
-  className 
-}) => {
-  const { pathname } = useLocation();
-  const isActive = pathname === to;
-
-  return (
-    <Link 
-      to={to} 
-      className={
-        className 
-          ? className({ isActive }).className 
-          : ''
-      }
-    >
-      {children}
-    </Link>
   );
 };
 

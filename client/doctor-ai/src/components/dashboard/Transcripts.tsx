@@ -9,6 +9,7 @@ import { useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import EditTranscriptionModal from './EditTranscriptionModal';
 import ConfirmationModal from '../../pages/ConfirmationModal';
+import MedicalSuggestions from './MedicalSuggestions';
 
 export interface Transcript {
   id: string;
@@ -43,75 +44,76 @@ const TranscriptCard: React.FC<TranscriptCardProps> = ({ transcript, image, onDo
   });
 
   return (
-    <div className="relative w-[280px] h-[340px] bg-[#1C1C1C] rounded-xl border border-[#2a2a2a] group transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:border-emerald-500/50 cursor-pointer overflow-hidden">
+    <div 
+      className="relative w-[280px] h-[360px] bg-[#2a2a2a] rounded-lg border border-[#3a3a3a] group transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:border-emerald-500/50 cursor-pointer overflow-hidden"
+    >
       {/* Top gradient bar */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600" />
       
       {/* Content */}
-      <div className="relative h-full flex flex-col p-5">
+      <div className="relative h-full flex flex-col p-4">
         {/* Avatar section */}
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-2">
           <div className="relative">
-            <img src={image} alt="Avatar" className="w-20 h-20 rounded-full border-4 border-[#3ECF8E]/30 hover:border-[#3ECF8E] transition-all" />
+            <img alt="Patient Profile" className="w-16 h-16 rounded-full border-4 border-[#3ECF8E]/30 hover:border-[#3ECF8E] transition-all" src={image} />
             <div className="absolute -inset-1 bg-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl rounded-full" />
           </div>
         </div>
 
         {/* Transcript info */}
-        <div className="text-center space-y-2">
-          <h3 className="text-lg font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300 truncate px-2">
+        <div className="text-center space-y-2 flex-1">
+          <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors duration-300 truncate px-2">
             {transcript.patientName}
           </h3>
 
-          {/* Date and Time badges */}
-          <div className="flex flex-col items-center gap-1.5">
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs">
-              {formattedDate}
-            </div>
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs">
-              {formattedTime}
-            </div>
+          {/* Status badge */}
+          <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
+            {transcript.type}
           </div>
 
+          {/* Info grid */}
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            <div className="bg-[#333] rounded-lg p-2 border border-[#3a3a3a] group-hover:border-emerald-500/20 transition-colors duration-300">
+              <div className="text-xs text-gray-400 mb-0.5">Date</div>
+              <div className="text-white font-medium text-sm">{formattedDate}</div>
+            </div>
+            <div className="bg-[#333] rounded-lg p-2 border border-[#3a3a3a] group-hover:border-emerald-500/20 transition-colors duration-300">
+              <div className="text-xs text-gray-400 mb-0.5">Time</div>
+              <div className="text-white font-medium text-sm">{formattedTime}</div>
+            </div>
+          </div>
         </div>
 
         {/* Action buttons - Fixed at bottom with glass effect */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#1C1C1C] via-[#1C1C1C] to-transparent">
-          <div className="flex flex-col gap-2">
-            {/* Download button */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#2a2a2a] via-[#2a2a2a] to-transparent">
+          <div className="grid grid-cols-3 gap-2 px-2">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onDownload(transcript);
               }}
-              className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-black transition-all duration-300 transform hover:scale-[1.02] active:scale-95 text-sm font-medium"
+              className="flex items-center justify-center py-2 rounded-lg bg-[#333] hover:bg-emerald-500/10 border border-[#3a3a3a] hover:border-emerald-500/30 transition-all duration-300 group/download"
             >
-              <Download className="w-4 h-4" />
-              <span>Download</span>
+              <Download className="w-4 h-4 text-emerald-500 transition-transform duration-300 group-hover/download:scale-110" />
             </button>
-
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(transcript);
-                }}
-                className="flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-[#2a2a2a] hover:bg-[#333] border border-[#333] text-emerald-500 transition-all duration-300 text-sm font-medium"
-              >
-                <Pencil className="w-4 h-4" />
-                <span>Edit</span>
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(transcript);
-                }}
-                className="flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-[#2a2a2a] hover:bg-[#333] border border-[#333] text-red-400 transition-all duration-300 text-sm font-medium"
-              >
-                <Trash2 className="w-4 h-4" />
-                <span>Delete</span>
-              </button>
-            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(transcript);
+              }}
+              className="flex items-center justify-center py-2 rounded-lg bg-[#333] hover:bg-emerald-500/10 border border-[#3a3a3a] hover:border-emerald-500/30 transition-all duration-300 group/edit"
+            >
+              <Pencil className="w-4 h-4 text-emerald-500 transition-transform duration-300 group-hover/edit:scale-110" />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(transcript);
+              }}
+              className="flex items-center justify-center py-2 rounded-lg bg-[#333] hover:bg-red-500/10 border border-[#3a3a3a] hover:border-red-500/30 transition-all duration-300 group/delete"
+            >
+              <Trash2 className="w-4 h-4 text-red-400 transition-transform duration-300 group-hover/delete:scale-110" />
+            </button>
           </div>
         </div>
       </div>
@@ -326,10 +328,10 @@ const handleEditTranscription = async (transcript: Transcript) => {
     'https://i.pravatar.cc/150?img=5'
   ];
 
-  return (
-    <div className="min-h-screen bg-[#1C1C1C] p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+  return (<>
+    <div className="min-h-screen bg-[#1C1C1C]">
+      <div className="max-w-[120rem] mx-auto p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 max-w-[90rem] mx-auto">
           <div className="flex items-center space-x-4">
             <h2 className="text-3xl font-bold text-white flex items-center gap-3">
               Transcripts
@@ -404,7 +406,8 @@ const handleEditTranscription = async (transcript: Transcript) => {
           </div>
         </div>
 
-        {loading ? (
+
+          {loading ? (
           <div className="flex justify-center items-center h-64">
             <Spinner />
           </div>
@@ -415,17 +418,24 @@ const handleEditTranscription = async (transcript: Transcript) => {
             description={error}
           />
         ) : filteredTranscripts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-10 justify-items-center">
-            {filteredTranscripts.map((transcript, index) => (
-              <TranscriptCard 
-                key={transcript.id} 
-                transcript={transcript} 
-                image={transcriptImages[index % transcriptImages.length]}
-                onDownload={handleDownloadTranscript}
-                onEdit={handleEditTranscription}
-                onDelete={() => setTranscriptionToDelete(transcript)}
-              />
-            ))}
+          <div className="flex relative min-h-[calc(100vh-12rem)] pl-50">
+            <div className="-mr-8">
+              <MedicalSuggestions />
+            </div>
+            <div className="flex-1 -ml-26">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-8 max-w-[900px] mx-auto">
+                {filteredTranscripts.map((transcript, index) => (
+                  <TranscriptCard 
+                    key={transcript.id} 
+                    transcript={transcript} 
+                    image={transcriptImages[index % transcriptImages.length]}
+                    onDownload={handleDownloadTranscript}
+                    onEdit={handleEditTranscription}
+                    onDelete={() => setTranscriptionToDelete(transcript)}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         ) : (
           <EmptyState
@@ -445,6 +455,7 @@ const handleEditTranscription = async (transcript: Transcript) => {
             }
           />
         )}
+        </div>
       </div>
 
       <AnimatePresence>
@@ -469,7 +480,8 @@ const handleEditTranscription = async (transcript: Transcript) => {
           />
         )}
       </AnimatePresence>
-    </div>
+
+    </>
   );
 };
 

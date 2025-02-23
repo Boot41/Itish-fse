@@ -56,7 +56,7 @@ func TestCORSMiddleware(t *testing.T) {
 			// Create a new Gin router
 			router := gin.New()
 			router.Use(CORSMiddleware())
-			
+
 			// Add a test endpoint
 			router.Any("/test", func(c *gin.Context) {
 				c.Status(http.StatusOK)
