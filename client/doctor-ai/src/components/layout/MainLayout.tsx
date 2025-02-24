@@ -88,8 +88,8 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
                 <></>
               ) : (
                 <>
-                  <NavLink to="/about">About</NavLink>
-                  <NavLink to="/features">Features</NavLink>
+                  <NavLink to="/about" className="nav-link">About</NavLink>
+                  <NavLink to="/features" className="nav-link">Features</NavLink>
                   <button className="btn btn-primary" onClick={() => setIsAuthModalOpen(true)}>
                     <span>Sign In</span>
                   </button>
@@ -141,7 +141,7 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
                       `}
                       onClick={() => setIsOpen(false)}
                     >
-                      <ClipboardList className="w-5 h-5 inline-block mr-1" />
+                      <ClipboardList className="w-5 h-5 inline-block mr-1 nav-link" />
                       Transcripts
                     </NavLink>
                     <button 

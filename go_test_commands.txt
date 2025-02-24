@@ -7,6 +7,7 @@ itish@itish-Latitude-3450:~/go_projects/doctor_ai$ source ~/.bashrc
 
 // Normal test
 richgo test -v ./...
+richgo test -v ./... 2>&1 | grep '^=== RUN' | wc -l
 
 // Coverage report
 richgo test -coverprofile=coverage.out ./...
