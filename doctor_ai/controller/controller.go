@@ -669,6 +669,35 @@ type MonthlyStatsRequest struct {
 	Months int    `json:"months"`
 }
 
+func GetPatientTranscript(c *gin.Context) {
+	var req struct {
+		Email string `json:"email"`
+		Name  string `json:"name"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Println("Invalid request body:", err)
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input"})
+		return
+	}
+
+	// Get doctor ID using email
+	doctorID, err := service.GetDoctorIDByEmail(req.Email)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid doctor email"})
+		return
+	}
+
+	// Get transcript for specific patient
+	transcript, err := service.GetPatientTranscript(doctorID, req.Name)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"transcript": transcript,
+	})
+}
 func GetMonthlyStatistics(c *gin.Context) {
 	var request MonthlyStatsRequest
 	if err := c.ShouldBindJSON(&request); err != nil {

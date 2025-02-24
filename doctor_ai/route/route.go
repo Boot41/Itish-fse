@@ -29,11 +29,12 @@ func SetupRoutes(r *gin.Engine) {
 	// Patient routes
 	patientsGroup := r.Group("/patients")
 	{
-		patientsGroup.POST("/", controller.CreatePatient)                //done
-		patientsGroup.POST("/patientsList", controller.GetPatients)      //done
-		patientsGroup.POST("/:id/getPatient", controller.GetPatientByID) // done
-		patientsGroup.PUT("/:id/update", controller.UpdatePatient)       // done
-		patientsGroup.POST("/:id", controller.DeletePatient)             // done
+		patientsGroup.POST("/", controller.CreatePatient)                  //done
+		patientsGroup.POST("/patientsList", controller.GetPatients)        //done
+		patientsGroup.POST("/:id/getPatient", controller.GetPatientByID)   // done
+		patientsGroup.PUT("/:id/update", controller.UpdatePatient)         // done
+		patientsGroup.POST("/:id", controller.DeletePatient)               // done
+		patientsGroup.POST("/transcript", controller.GetPatientTranscript) // Get patient transcript by name
 	}
 
 	// Dashboard & Statistics routes

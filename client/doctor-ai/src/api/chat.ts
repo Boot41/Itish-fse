@@ -1,9 +1,15 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const API_KEY = import.meta.env.VITE_GROQAPIKEY;
+const API_BASE_URL = 'https://api.groq.com/openai/v1';
+const API_KEY = process.env.VITE_GROQAPIKEY;
 
 export const chatApi = {
   sendMessage: async (message: string) => {
     try {
+      console.log('API Key:', API_KEY);
+      
+      if (!API_KEY) {
+        throw new Error('Groq API key not configured');
+      }
+
       const response = await fetch(`${API_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -28,7 +34,7 @@ export const chatApi = {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
+        const errorData = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
         throw new Error(
           errorData?.error?.message || 
           `HTTP error! status: ${response.status}`

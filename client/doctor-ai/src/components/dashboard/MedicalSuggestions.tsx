@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, MessageCircle, Search } from 'lucide-react';
+import { Bot, MessageCircle, Search, User } from 'lucide-react';
 import { chatApi } from '../../api/chat';
+import { useAuthStore } from '../../stores/authStore';
 
 interface Suggestion {
   text: string;
-  type: 'medicine' | 'general';
+  type: 'medicine' | 'general' | 'user' | 'error';
   details?: string;
+  patientName?: string;
 }
 
 interface ExpandedState {
@@ -22,7 +24,7 @@ const MedicalSuggestions: React.FC = () => {
   const fetchMedicineSuggestions = async (query: string) => {
     setLoading(true);
     try {
-      const prompt = `Given the medical condition or symptoms "${query}", suggest 3 potential medications or treatments. For each suggestion:
+      const prompt = `Given the medical condition or symptoms "${query}", suggest 6 potential medications or treatments. For each suggestion:
 1. Start with a dash (-)
 2. First line: Name of medication/treatment
 3. Second line: Brief description of how it works and common usage
@@ -49,9 +51,58 @@ Keep each suggestion concise but informative.`;
         }
       }
 
-      setSuggestions((prev) => [...newSuggestions, ...prev.filter((s) => s.type === 'general')]);
+      setSuggestions(newSuggestions);
     } catch (error) {
-      console.error('Error fetching medicine suggestions:', error);
+      handleError(error, 'fetching medicine suggestions');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const extractUserQuery = async (query: string) => {
+    setLoading(true);
+    try {
+      const prompt = `Analyze this query: "${query}"
+Extract the following information:
+1. Patient name (if mentioned)
+2. Main symptoms or condition
+3. Any specific concerns
+
+Format the response as:
+Patient: [name or "Not mentioned"]
+Symptoms: [main symptoms/condition]
+Concerns: [specific concerns or "None mentioned"]`;
+
+      const { response } = await chatApi.sendMessage(prompt);
+      const lines = response.split('\n');
+      
+      let patientName = "Not mentioned";
+      let symptoms = "";
+      let concerns = "";
+
+      lines.forEach((line: string) => {
+        if (line.startsWith('Patient:')) patientName = line.replace('Patient:', '').trim();
+        if (line.startsWith('Symptoms:')) symptoms = line.replace('Symptoms:', '').trim();
+        if (line.startsWith('Concerns:')) concerns = line.replace('Concerns:', '').trim();
+      });
+
+      // Add user query as a suggestion
+      setSuggestions(prev => [{
+        text: symptoms,
+        type: 'user',
+        details: concerns !== "None mentioned" ? concerns : undefined,
+        patientName: patientName !== "Not mentioned" ? patientName : undefined
+      }, ...prev]);
+
+      // Fetch medicine suggestions based on symptoms
+      await fetchMedicineSuggestions(symptoms);
+
+      // Fetch patient history
+      if (patientName !== "Not mentioned") {
+        await fetchPatientHistory(patientName);
+      }
+    } catch (error) {
+      handleError(error, 'processing user query');
     } finally {
       setLoading(false);
     }
@@ -60,7 +111,7 @@ Keep each suggestion concise but informative.`;
   const fetchMedicalTrivia = async () => {
     setLoading(true);
     try {
-      const prompt = `Share 3 fascinating medical facts or trivia. For each fact:
+      const prompt = `Share 6 fascinating medical facts or trivia. For each fact:
 1. Start with a dash (-)
 2. First line: Brief, intriguing medical fact as a title
 3. Second line: Detailed explanation with interesting context
@@ -88,28 +139,139 @@ Make them engaging and educational, focusing on surprising or lesser-known medic
 
       setSuggestions(triviaFacts);
     } catch (error) {
-      console.error('Error fetching medical trivia:', error);
+      handleError(error, 'fetching medical trivia');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    const fetchInitialSuggestions = async () => {
-      setLoading(true);
-      try {
-        await fetchMedicalTrivia();
-        setSuggestions((prev) => [
-          ...prev,
-          { text: 'Check latest blood test results', type: 'general' },
-          { text: 'Update vaccination records', type: 'general' },
-          { text: 'Review recent symptoms and progress', type: 'general' },
-        ]);
-      } finally {
-        setLoading(false);
+  const fetchPatientHistory = async (patientName: string) => {
+    setLoading(true);
+    try {
+      // Get doctor's email from auth store
+      const email = await useAuthStore.getState().getDecryptedEmail();
+      if (!email) {
+        throw new Error('Not authenticated');
       }
-    };
-    fetchInitialSuggestions();
+
+      console.log('Fetching transcripts for patient:', patientName, 'doctor:', email);
+      
+      // Fetch transcripts from backend
+      const response = await fetch(`http://localhost:8080/patients/transcript`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: patientName,
+          email: email
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch transcripts: ${response.statusText}`);
+      }
+      
+      const transcripts = await response.json();
+      console.log('Received transcripts:', transcripts);
+
+      // Generate summary using Groq
+      const prompt = `Analyze these medical transcripts and provide a comprehensive summary:
+${JSON.stringify(transcripts, null, 2)}
+
+Format the summary as:
+Medical History: [key medical events and conditions]
+Current Medications: [list of current medications]
+Allergies: [known allergies]
+Recent Visits: [summary of recent visits]
+Key Observations: [important medical observations]
+Recommendations: [any recommended follow-ups or actions]`;
+
+      const { response: summary } = await chatApi.sendMessage(prompt);
+      console.log('Generated summary:', summary);
+
+      // Parse the summary
+      const lines = summary.split('\n');
+      let history = '';
+      let medications = '';
+      let allergies = '';
+      let visits = '';
+      let observations = '';
+      let recommendations = '';
+
+      lines.forEach((line: string) => {
+        if (line.startsWith('Medical History:')) history = line.replace('Medical History:', '').trim();
+        if (line.startsWith('Current Medications:')) medications = line.replace('Current Medications:', '').trim();
+        if (line.startsWith('Allergies:')) allergies = line.replace('Allergies:', '').trim();
+        if (line.startsWith('Recent Visits:')) visits = line.replace('Recent Visits:', '').trim();
+        if (line.startsWith('Key Observations:')) observations = line.replace('Key Observations:', '').trim();
+        if (line.startsWith('Recommendations:')) recommendations = line.replace('Recommendations:', '').trim();
+      });
+
+      // Add the summary as a suggestion
+      setSuggestions(prev => [{
+        text: `Patient Summary: ${patientName}`,
+        type: 'user',
+        details: [
+          history && `📋 Medical History:\n\n${history}`,
+          medications && `💊 Current Medications:\n\n${medications}`,
+          allergies && `⚠️ Allergies:\n\n${allergies}`,
+          visits && `🏥 Recent Visits:\n\n${visits}`,
+          observations && `👁️ Key Observations:\n\n${observations}`,
+          recommendations && `📝 Recommendations:\n\n${recommendations}`
+        ].filter(Boolean).join('\n\n'),
+        patientName
+      }, ...prev]);
+
+    } catch (error) {
+      handleError(error, 'fetching patient history');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleError = (error: any, context: string) => {
+    console.error(`Error in ${context}:`, error);
+    setSuggestions(prev => [{
+      text: `Error in ${context}`,
+      type: 'error',
+      details: error.message || 'An unexpected error occurred'
+    }, ...prev]);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    console.log('=== Starting Query Processing ===');
+    console.log('Input:', input);
+    console.time('queryProcessing');
+
+    try {
+      // Check for "tell me about [name]" pattern first
+      const tellMeAboutMatch = input.match(/tell me about\s+["']?([^"']+)["']?/i);
+      if (tellMeAboutMatch) {
+        const patientName = tellMeAboutMatch[1].trim();
+        console.log('Detected "tell me about" pattern:', {
+          originalQuery: input,
+          patientName,
+          timestamp: new Date().toISOString()
+        });
+        await fetchPatientHistory(patientName);
+      } else {
+        await extractUserQuery(input);
+      }
+      setInput('');
+    } catch (error) {
+      handleError(error, 'processing form submission');
+    }
+
+    console.timeEnd('queryProcessing');
+    console.log('=== Query Processing Complete ===');
+  };
+
+  useEffect(() => {
+    fetchMedicalTrivia();
   }, []);
 
   return (
@@ -139,10 +301,10 @@ Make them engaging and educational, focusing on surprising or lesser-known medic
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && input.trim()) {
-                  fetchMedicineSuggestions(input.trim());
+                  handleSubmit(e);
                 }
               }}
-              placeholder="Enter symptoms or condition..."
+              placeholder="Describe symptoms or ask about a patient..."
               className="w-full bg-[#333] text-white rounded-xl pl-11 pr-4 py-3 text-sm border border-[#3a3a3a] group-hover:border-[#4a4a4a] focus:border-emerald-500/50 focus:outline-none transition-all duration-300 placeholder:text-gray-500"
               autoComplete="off"
             />
@@ -170,7 +332,7 @@ Make them engaging and educational, focusing on surprising or lesser-known medic
                 onClick={() => {
                   if (suggestion.type === 'general') {
                     setInput(suggestion.text);
-                    fetchMedicineSuggestions(suggestion.text);
+                    extractUserQuery(suggestion.text);
                   } else {
                     setExpandedStates((prev) => ({ ...prev, [index]: !prev[index] }));
                   }
@@ -188,6 +350,10 @@ Make them engaging and educational, focusing on surprising or lesser-known medic
                     className={`p-1.5 rounded-lg transition-all duration-300 ${
                       suggestion.type === 'medicine'
                         ? 'bg-emerald-500/10 group-hover:bg-emerald-500/20'
+                        : suggestion.type === 'user'
+                        ? 'bg-blue-500/10 group-hover:bg-blue-500/20'
+                        : suggestion.type === 'error'
+                        ? 'bg-red-500/10 group-hover:bg-red-500/20'
                         : 'bg-[#333] group-hover:bg-[#3a3a3a]'
                     }`}
                   >
@@ -195,6 +361,16 @@ Make them engaging and educational, focusing on surprising or lesser-known medic
                       <MessageCircle
                         className="w-3.5 h-3.5 transition-colors duration-300 text-emerald-500"
                       />
+                    ) : suggestion.type === 'user' ? (
+                      <User
+                        className="w-3.5 h-3.5 transition-colors duration-300 text-blue-500"
+                      />
+                    ) : suggestion.type === 'error' ? (
+                      <div
+                        className="w-3.5 h-3.5 transition-colors duration-300 text-red-500"
+                      >
+                        ⚠️
+                      </div>
                     ) : (
                       <Search
                         className="w-3.5 h-3.5 transition-colors duration-300 text-emerald-400 group-hover:text-emerald-300"
@@ -203,9 +379,15 @@ Make them engaging and educational, focusing on surprising or lesser-known medic
                   </div>
                 </motion.div>
                 <motion.div
-                  className={`flex-1 px-4 py-3 rounded-xl text-white text-sm cursor-pointer backdrop-blur-sm ${suggestion.type === 'general' ? 'hover:scale-[1.02]' : ''} ${
+                  className={`flex-1 px-4 py-3 rounded-xl text-white text-sm cursor-pointer backdrop-blur-sm ${
+                    suggestion.type === 'general' ? 'hover:scale-[1.02]' : ''
+                  } ${
                     suggestion.type === 'medicine'
                       ? 'bg-emerald-500/10 hover:bg-emerald-500/15'
+                      : suggestion.type === 'user'
+                      ? 'bg-blue-500/10 hover:bg-blue-500/15'
+                      : suggestion.type === 'error'
+                      ? 'bg-red-500/10 hover:bg-red-500/15'
                       : 'bg-[#333] hover:bg-[#3a3a3a]'
                   } ${expandedStates[index] ? 'ring-1 ring-emerald-500/20' : ''}`}
                   layout
@@ -215,7 +397,14 @@ Make them engaging and educational, focusing on surprising or lesser-known medic
                   }}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="font-medium">{suggestion.text}</div>
+                    <div className="font-medium">
+                      {suggestion.text}
+                      {suggestion.patientName && (
+                        <span className="ml-2 text-xs text-blue-400">
+                          Patient: {suggestion.patientName}
+                        </span>
+                      )}
+                    </div>
                     <motion.div
                       className="text-xs text-emerald-500/70 ml-2"
                       animate={{ opacity: expandedStates[index] ? 1 : 0.5 }}
@@ -249,7 +438,7 @@ Make them engaging and educational, focusing on surprising or lesser-known medic
         <div className="px-6 py-4 border-t border-[#3a3a3a] bg-gradient-to-r from-[#2a2a2a] to-[#2f2f2f]">
           <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            Enter symptoms for AI-powered medicine suggestions
+            Enter symptoms or patient details for AI assistance
           </div>
         </div>
       </motion.div>

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	aai "github.com/AssemblyAI/assemblyai-go-sdk"
+	"gorm.io/gorm"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/google/uuid"
@@ -152,6 +153,55 @@ func validatePatient(patient *models.Patient) error {
 		return errors.New("patient age must be greater than zero")
 	}
 	return nil
+}
+
+// In process
+// GetDoctorIDByEmail retrieves doctor ID using their email
+func GetDoctorIDByEmail(email string) (uuid.UUID, error) {
+	var doctor models.Doctor
+	result := initializers.DB.Where("email = ?", email).First(&doctor)
+	if result.Error != nil {
+		return uuid.Nil, result.Error
+	}
+	return doctor.ID, nil
+}
+
+// type TranscriptResponse struct {
+// 	ID            uuid.UUID `json:"id"`
+// 	PatientID     uuid.UUID `json:"patientId"`
+// 	PatientName   string    `json:"patientName"`
+// 	Timestamp     time.Time `json:"timestamp"`
+// 	Type          string    `json:"type"`
+// 	Status        string    `json:"status"`
+// 	TranscriptURL string    `json:"transcriptUrl"`
+// }
+
+// GetPatientTranscript retrieves the latest transcript for a specific patient
+func GetPatientTranscript(doctorID uuid.UUID, patientName string) (*models.Transcription, error) {
+	// First find the patient
+	var patient models.Patient
+	result := initializers.DB.Where("doctor_id = ? AND name = ?", doctorID, patientName).First(&patient)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("patient not found")
+		}
+		return nil, fmt.Errorf("error finding patient: %v", result.Error)
+	}
+
+	// Get the latest transcript for this patient
+	var transcript models.Transcription
+	result = initializers.DB.Where("patient_id = ?", patient.ID).
+		Order("created_at DESC").
+		First(&transcript)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("no transcript found for patient")
+		}
+		return nil, fmt.Errorf("error finding transcript: %v", result.Error)
+	}
+
+	return &transcript, nil
 }
 
 func GetPatients(doctorID uuid.UUID, page, limit int) ([]models.Patient, int64, error) {

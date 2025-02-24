@@ -12,6 +12,7 @@
 [GIN-debug] POST   /patients/:id/getPatient  --> itish41/doctor_ai_assistant/controller.GetPatientByID (4 handlers)
 [GIN-debug] PUT    /patients/:id/update      --> itish41/doctor_ai_assistant/controller.UpdatePatient (4 handlers)
 [GIN-debug] POST   /patients/:id             --> itish41/doctor_ai_assistant/controller.DeletePatient (4 handlers)
+[GIN-debug] POST   /patients/transcript      --> itish41/doctor_ai_assistant/controller.GetPatientTranscript (4 handlers)
 [GIN-debug] POST   /dashboard/transcripts    --> itish41/doctor_ai_assistant/controller.GetDashboardTranscripts (4 handlers)
 [GIN-debug] POST   /dashboard/patients       --> itish41/doctor_ai_assistant/controller.GetDashboardPatients (4 handlers)
 [GIN-debug] POST   /dashboard/statistics/daily --> itish41/doctor_ai_assistant/controller.GetDailyStatistics (4 handlers)

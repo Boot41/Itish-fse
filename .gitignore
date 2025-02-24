@@ -1,5 +1,5 @@
-# Ignore environment variable files
-doctor_ai/.env
-client/doctor-ai/.env
-doctor_ai/.env
-client/doctor-ai/.env
+# # Ignore environment variable files
+# doctor_ai/.env
+# client/doctor-ai/.env
+# doctor_ai/.env
+# client/doctor-ai/.env

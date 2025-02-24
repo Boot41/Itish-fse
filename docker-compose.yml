@@ -20,5 +20,7 @@ services:
       - "8080:8080"
     volumes:
       - ./doctor_ai/pdfs:/app/pdfs
+    environment:
+      - VITE_BACKEND_URL=http://backend:8080
     env_file:
       - ./doctor_ai/.env
