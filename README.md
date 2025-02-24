@@ -2,7 +2,7 @@
 <img src="https://github.com/Boot41/Itish-fse/blob/main/client/doctor-ai/public/Screenshot%20from%202025-02-24%2014-24-58.png"/>
 
 ## Overview
-Doctor AI is an innovative platform that leverages artificial intelligence to assist medical professionals in their daily tasks. The platform provides features like AI-powered voice transcription, automated report generation, and advanced analytics.
+Pocket Doc is an innovative platform that leverages artificial intelligence to assist medical professionals in their daily tasks. The platform provides features like AI-powered voice transcription, automated report generation, and advanced analytics.
 
 ## Features
 - **AI-Powered Transcription**: Real-time voice-to-text conversion with medical terminology recognition
