@@ -8,6 +8,11 @@ const Dashboard = lazy(() => import('./components/dashboard/Dashboard'));
 const LandingPage = lazy(() => import('./components/landing/LandingPage'));
 const About = lazy(() => import('./pages/About'));
 const Features = lazy(() => import('./pages/Features'));
+const Documentation = lazy(() => import('./pages/Documentation'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const Terms = lazy(() => import('./pages/Terms'));
+const Support = lazy(() => import('./pages/Support'));
+const Contact = lazy(() => import('./pages/Contact'));
 const Patients = lazy(() => import('./components/dashboard/Patients'));
 const Logs = lazy(() => import('./components/dashboard/Transcripts'));
 
@@ -80,6 +85,11 @@ const App: React.FC = () => {
               {/* Public Routes */}
               <Route path="/about" element={<About />} />
               <Route path="/features" element={<Features />} />
+              <Route path="/documentation" element={<Documentation />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/support" element={<Support />} />
+              <Route path="/contact" element={<Contact />} />
               
               {/* Protected Routes */}
               <Route element={<ProtectedRoute />}>

@@ -235,10 +235,10 @@ const MainLayout: FC<MainLayoutProps> = ({ children }) => {
             <div className="footer-section">
               <h4 className="footer-heading">Resources</h4>
               <ul className="footer-links">
-                <li><a href="/docs" className="footer-link">Documentation</a></li>
-                <li><a href="/privacy" className="footer-link">Privacy Policy</a></li>
-                <li><a href="/terms" className="footer-link">Terms of Service</a></li>
-                <li><a href="/support" className="footer-link">Support</a></li>
+                <li><NavLink to="/documentation" className="footer-link">Documentation</NavLink></li>
+                <li><NavLink to="/privacy" className="footer-link">Privacy Policy</NavLink></li>
+                <li><NavLink to="/terms" className="footer-link">Terms of Service</NavLink></li>
+                <li><NavLink to="/support" className="footer-link">Support</NavLink></li>
               </ul>
             </div>
             <div className="footer-section col-span-full border-t border-dark-lighter pt-8 mt-8 text-center">

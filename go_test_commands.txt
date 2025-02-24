@@ -2,8 +2,8 @@ go install github.com/agiledragon/gomonkey/v2@latest
 go install github.com/kyoh86/richgo@latest
 go: downloading github.com/mattn/go-isatty v0.0.17
 go: downloading golang.org/x/sys v0.5.0
-itish@itish-Latitude-3450:~/go_projects/doctor_ai$ export PATH=$PATH:$(go env GOPATH)/bin
-itish@itish-Latitude-3450:~/go_projects/doctor_ai$ source ~/.bashrc
+export PATH=$PATH:$(go env GOPATH)/bin
+source ~/.bashrc
 
 // Normal test
 richgo test -v ./...
