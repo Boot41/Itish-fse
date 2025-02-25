@@ -159,7 +159,7 @@ services:
 - Modify the doctor model to include a field for storing data required for generating dynamic data.
 - The backend logic for processing dynamic data is already implemented.
 
-### 3. Improved Suggestions Chat Window
+### 3. Improved Suggestions Chat Window (☑️)
 - Enhance the Suggestions Window to access and read data from transcripts.
 
 ## Contributing
