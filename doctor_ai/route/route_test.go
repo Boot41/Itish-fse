@@ -219,7 +219,7 @@ func TestRouteGroups(t *testing.T) {
 	t.Run("Route Counts", func(t *testing.T) {
 		assert.Equal(t, 4, authCount, "Auth group should have 4 routes")
 		assert.Equal(t, 5, transcriptionCount, "Transcription group should have 5 routes")
-		assert.Equal(t, 5, patientsCount, "Patients group should have 5 routes")
+		assert.Equal(t, 6, patientsCount, "Patients group should have 5 routes")
 		assert.Equal(t, 5, dashboardCount, "Dashboard group should have 5 routes")
 	})
 }
